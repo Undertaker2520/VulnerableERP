@@ -1,68 +1,55 @@
-using Microsoft.EntityFrameworkCore;
-using DataAccessLayer;
 using BusinessLayer.Interfaces;
 using BusinessLayer.Services;
+using DataAccessLayer;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi; 
 using System.Text;
-
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
-
-// Aggiungi i servizi Swagger
 builder.Services.AddEndpointsApiExplorer();
-//builder.Services.AddSwaggerGen();
 
+// 1. Configurazione Swagger con Lucchetto per Swashbuckle v10+
 builder.Services.AddSwaggerGen(c =>
 {
-    //aggiunge la definizione di sicurezza per il Bearer Token
-    c.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.OpenApiSecurityScheme
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
-        Description = "Inserisci il token JWT in questo formato: Bearer {tuo_token}",
+        Description = "IMPORTANTE: Inserisci la parola 'Bearer', poi uno spazio, poi il tuo token.",
         Name = "Authorization",
-        In = Microsoft.OpenApi.ParameterLocation.Header,
-        Type = Microsoft.OpenApi.SecuritySchemeType.ApiKey,
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.ApiKey,
         Scheme = "Bearer"
     });
 
-    //Applica il requisito a tutti gli endpoint
-    c.AddSecurityRequirement(new Microsoft.OpenApi.OpenApiSecurityRequirement
+    // 2. NUOVA SINTASSI per agganciare il lucchetto alle API
+    c.AddSecurityRequirement(document => new OpenApiSecurityRequirement
     {
-        {
-            
-            new Microsoft.OpenApi.OpenApiSecurityScheme
-            {
-                Reference = new Microsoft.OpenApi.BaseOpenApiReference
-                {
-                    Type = Microsoft.OpenApi.ReferenceType.SecurityScheme,
-                    Id = "Bearer"
-                }
-            },
-            Array.Empty<string>()
-        }
+        [new OpenApiSecuritySchemeReference("Bearer", document)] = []
     });
+});
 
-}); 
-
+// 2. Database e Servizi
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-//register service (Dependency Injection)   
 builder.Services.AddScoped<IAuthService, AuthService>();
 
-// Configurazione Auth JWT vulnerabile
+// 3. Autenticazione JWT Vulnerabile
 builder.Services.AddAuthentication(options =>
 {
-    options.DefaultAuthenticateScheme = "JwtBearer";
-    options.DefaultChallengeScheme = "JwtBearer";
-}).AddJwtBearer(options =>
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
 {
     options.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateIssuer = false,
         ValidateAudience = false,
-        ValidateLifetime = false, //vulnerabilitá (token non scadono mai)
+        ValidateLifetime = false,
         ValidateIssuerSigningKey = true,
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes("QuestaEunaChiaveSegretaMoltoDebole123!"))
     };
@@ -72,7 +59,7 @@ builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
-// Attiva l'interfaccia Swagger
+// 4. Pipeline
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -81,7 +68,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseAuthentication();
 app.UseAuthorization();
-
 app.MapControllers();
 
 app.Run();
+// (Ho rimosso la classe custom in fondo, non ci serve più!)

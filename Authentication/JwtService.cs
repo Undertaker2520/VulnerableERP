@@ -22,7 +22,7 @@ namespace Authentication
                     new Claim(ClaimTypes.NameIdentifier, user.id.ToString()),
                     new Claim(ClaimTypes.Name, user.Username),
                     //vul blind trust: inseriamo ruolo nel token
-                    new Claim("IsAdmin", user.isAdmin.ToString())
+                    new Claim("isAdmin", user.isAdmin.ToString())
                 }),
                 Expires = DateTime.UtcNow.AddDays(7),
                 SigningCredentials = new SigningCredentials(
