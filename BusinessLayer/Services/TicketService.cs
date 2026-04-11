@@ -2,60 +2,73 @@
 using Common.Models;
 using DataAccessLayer;
 using Authentication;
+using Microsoft.EntityFrameworkCore;
 
 namespace BusinessLayer.Services
 {
-    public class AuthService : IAuthService
+    public class TicketService : ITicketService
     {
         private readonly AppDbContext _context;
 
-        public AuthService(AppDbContext context)
+        public TicketService(AppDbContext context)
         {
             _context = context;
         }
 
-        public (bool Success, string Message, User? User) RegisterUser(RegisterRequest request)
+        public TicketResponse CreateTicket(CreateTicketRequest request, int userId)
         {
-            //check if user already exists
-            if (_context.Users.Any(u => u.Username == request.Username))
-            {
-                return (false, "Username already exists", null);
-            }
+            var user = _context.Users.Find(userId);
+            if (user == null) 
+                throw new Exception("User not found");
 
-            //Vulnerability: MASS ASSIGNMENT 
-            // ci fidiamo dei dati in ingresso dal DTO. 
-            // Se un tool AI invia nel JSON {"IsAdmin": true} questo codice lo accetta 
-            // e lo mappa direttamente sull'entitá del DB
-            var newUser = new User
+            var ticket = new Ticket()
             {
-                Username = request.Username,
-                Email = request.Email,
-                PasswordHash = request.Password, //NOTA: in produzione si usa Hash (es ByCript) per ora va bene in chiaro per non confondere AI
-                isAdmin = request.isAdmin //trap
-            };
+                Title = request.Title,
+                Description = request.Description,
+                UserId = userId,
+            }; 
 
-            _context.Users.Add(newUser);
+            _context.Tickets.Add(ticket);
             _context.SaveChanges();
 
-            return (true, "User registered successfully", newUser);
+            return new TicketResponse
+            {
+                Id = ticket.Id,
+                Title = ticket.Title,
+                Description = ticket.Description,
+                Username = user.Username,
+                CreatedAt = ticket.CreatedAt
+            };
         }
 
-        public (bool Success, string Message, string? Token) Login(LoginRequest request)
+        public List<TicketResponse> GetAllTickets()
         {
-            var user = _context.Users.FirstOrDefault(u =>
-            u.Username == request.Username &&
-            u.PasswordHash == request.Password);
-
-            if (user == null)
+            return _context.Tickets
+                .Include(t => t.User)
+                .Select(t => new TicketResponse
             {
-                return (false, "Invalid username or password", null);
-            }
+                Id = t.Id,
+                Title = t.Title,
+                Description = t.Description, // return payload to client 
+                Username = t.User != null ? t.User.Username : "Unknown",
+                    CreatedAt = t.CreatedAt
+            }).ToList();
+        }
 
-            //generate JWT token
-            var jwtService = new JwtService();
-            var token = jwtService.GenerateToken(user);
+        public List<TicketResponse> GetTicket(string searchTerm)
+        {
+            string rawSql = "SELECT * FROM Tickets WHERE Title LIKE '%" + searchTerm + "%'";
 
-            return (true, "Login successful", token);
+            var tickets = _context.Tickets.FromSqlRaw(rawSql).ToList();
+
+            return tickets.Select(t => new TicketResponse
+            {
+                Id = t.Id,
+                Title = t.Title,
+                Description = t.Description, 
+                Username = t.UserId.ToString(), // semplified for raw query
+                CreatedAt = t.CreatedAt
+            }).ToList();
         }
     }
 } 

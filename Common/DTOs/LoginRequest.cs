@@ -1,10 +1,9 @@
 ﻿namespace Common.Models
 {
-    public class RegisterRequest
+    public class LoginRequest
     {
         public String Username { get; set; } = String.Empty;
         public String Password { get; set; } = String.Empty;
-        public String Email { get; set; } = String.Empty;   
-        public bool isAdmin { get; set; }
+        
     }
 }

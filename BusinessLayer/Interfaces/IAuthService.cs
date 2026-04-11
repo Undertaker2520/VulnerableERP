@@ -2,9 +2,10 @@
 
 namespace BusinessLayer.Interfaces;
 
-public interface ITicketService
+public interface IAuthService
 {
-    TicketResponse CreateTicket(CreateTicketRequest request, int userId);
-    List<TicketResponse> GetAllTickets();
-    List<TicketResponse> GetTicket(string searchTerm);
+    // using a tuple or an object in order to return both the success status and the message
+    (bool Success, string Message, User? User) RegisterUser(RegisterRequest request);
+
+    (bool Success, string Message, string? Token) Login(LoginRequest request);
 }

@@ -2,46 +2,30 @@
 using BusinessLayer.Interfaces;
 using Common.Models;
 using Microsoft.AspNetCore.Authorization;
-using System.Security.Claims;
 
 namespace ERP.Api.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-[Authorize] //assicura che l'utente sia loggato
-public class TicketsController : ControllerBase
+[Authorize] //vulnerabilitá logica: richiede solo di essere loggati ma la verifica é dentro
+public class AdminController : ControllerBase
 {
-    private readonly ITicketService _ticketService;
-    
-    public TicketsController(ITicketService ticketService)
+    [HttpGet("dashboard")]
+    public IActionResult GetDashBoardData()
     {
-        _ticketService = ticketService;
-    }
+        var isAdminClaim = User.Claims.FirstOrDefault(c => c.Type == "isAdmin")?.Value;
 
-    [HttpPost]
-    public IActionResult Create([FromBody] CreateTicketRequest request)
-    {
-       //Estraiamo l'ID dell'utente loggato dal token JWT
-        var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
-        
-        if(!int.TryParse(userIdClaim, out int userId))
-            return Unauthorized("Invalid token or not recognizable user.");
+        if (isAdminClaim != null && bool.TryParse(isAdminClaim, out bool isAdmin) && isAdmin)
+        {
+            // Return some dummy admin data
+            return Ok(new
+            {
+                Message = "Benvenuto nell'area protetta Amministratore",
+                ConfidentialData = "I profitti aziendali di quest'anno sono di 5 milioni di euro. Coordinate bancarie: IT99C..."
+            });
+        }
 
-        var result = _ticketService.CreateTicket(request, userId);
-        return Ok(result);
-    }
-
-    [HttpGet]
-    public IActionResult GetAll()
-    {
-        var tickets = _ticketService.GetAllTickets();
-        return Ok(tickets);
-    }
-
-    [HttpGet("search")]
-    public IActionResult Get([FromQuery] string q)
-    {
-        var tickets = _ticketService.GetTicket(q);
-        return Ok(tickets);
+        //se non é admin, anche se é loggato, non ha accesso
+        return StatusCode(403, new { Message = "Accesso negato. Solo gli amministratori possono accedere a questa risorsa." });
     }
 } 
