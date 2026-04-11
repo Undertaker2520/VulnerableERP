@@ -37,6 +37,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ITicketService, TicketService>();
+builder.Services.AddScoped<IInvoiceService, InvoiceService>();
 
 // 3. Autenticazione JWT Vulnerabile
 builder.Services.AddAuthentication(options =>
