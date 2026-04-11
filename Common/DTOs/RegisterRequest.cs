@@ -1,9 +1,18 @@
 ﻿namespace Common.Models
 {
-    public class LoginRequest
+    public class CreateTicketRequest
     {
-        public String Username { get; set; } = String.Empty;
-        public String Password { get; set; } = String.Empty;
-        
+        public string Title { get; set; }  = string.Empty;
+        public string Description { get; set; } = string.Empty;
+    }
+
+    public class TicketResponse
+    {
+        public int Id { get; set; }
+        public string Title { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
+        public string Username { get; set; } = string.Empty;
+        public DateTime CreatedAt { get; set; }
+
     }
 }

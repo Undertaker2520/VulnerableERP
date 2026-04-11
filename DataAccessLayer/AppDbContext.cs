@@ -10,6 +10,7 @@ public class AppDbContext : DbContext
     }
 
     public DbSet<User> Users { get; set; }
+    public DbSet<Ticket> Tickets { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -18,5 +19,12 @@ public class AppDbContext : DbContext
         //configurazioni base della tabella
         modelBuilder.Entity<User>().HasIndex(u => u.Username).IsUnique();
         modelBuilder.Entity<User>().HasIndex(u => u.Email).IsUnique();
+
+        //configurazione uno a molti (un utente puó avere molti ticket)
+        modelBuilder.Entity<Ticket>()
+            .HasOne(t => t.User)
+            .WithMany()
+            .HasForeignKey(t => t.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }
