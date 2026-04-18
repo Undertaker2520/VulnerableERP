@@ -1,6 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using BusinessLayer.Interfaces;
-using Common.Models;
+﻿using BusinessLayer.Interfaces;
+using Common.DTOs.User;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace ERP.Api.Controllers;
 

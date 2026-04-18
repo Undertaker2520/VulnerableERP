@@ -1,4 +1,5 @@
-﻿using Common.Models;
+﻿using Common.DTOs.Ticket;
+using Common.Models;
 
 namespace BusinessLayer.Interfaces;
 

@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using BusinessLayer.Interfaces;
-using Common.Models;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
+using Common.DTOs.Ticket;
 
 namespace ERP.Api.Controllers;
 

@@ -1,6 +1,6 @@
-﻿namespace Common.Models
+﻿namespace Common.DTOs.User
 {
-    public class RegisterRequest
+    public class RegisterRequest 
     {
         public String Username { get; set; } = String.Empty;
         public String Password { get; set; } = String.Empty;

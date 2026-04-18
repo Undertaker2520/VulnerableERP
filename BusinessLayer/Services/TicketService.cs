@@ -3,6 +3,7 @@ using Common.Models;
 using DataAccessLayer;
 using Authentication;
 using Microsoft.EntityFrameworkCore;
+using Common.DTOs.Ticket;
 
 namespace BusinessLayer.Services
 {

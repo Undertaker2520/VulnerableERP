@@ -1,4 +1,4 @@
-﻿namespace Common.Models
+﻿namespace Common.DTOs.User
 {
     public class LoginRequest
     {
