@@ -5,7 +5,7 @@ namespace ERP.Api.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-//VULNERABILITA': enpoint non protetto con [Authorize] che espone dati sensibili 
+// NOTA PER LA TESI: L'assenza deliberata di [Authorize] permette l'Information Disclosure
 public class SystemController : ControllerBase
 {
     private readonly ISystemService _systemService;
@@ -13,9 +13,9 @@ public class SystemController : ControllerBase
     public SystemController(ISystemService systemService) => _systemService = systemService;
 
     [HttpGet("debug/env")]
-    public IActionResult GetEnvironment()
+    public async Task<IActionResult> GetEnvironment()
     {
-        var envData = _systemService.GetEnvironmentInfo();
+        var envData = await _systemService.GetEnvironmentInfoAsync();
         return Ok(envData);
     }
 }

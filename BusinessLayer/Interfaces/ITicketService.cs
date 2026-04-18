@@ -5,7 +5,7 @@ namespace BusinessLayer.Interfaces;
 
 public interface ITicketService
 {
-    TicketResponse CreateTicket(CreateTicketRequest request, int userId);
-    List<TicketResponse> GetAllTickets();
-    List<TicketResponse> GetTicket(string searchTerm);
+    Task<TicketResponse> CreateTicketAsync(CreateTicketRequest request, int userId);
+    Task<List<TicketResponse>> GetAllTicketsAsync();
+    Task<List<TicketResponse>> GetTicketAsync(string searchTerm);
 }

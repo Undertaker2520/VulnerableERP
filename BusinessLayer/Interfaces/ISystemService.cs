@@ -2,5 +2,5 @@
 
 public interface ISystemService
 {
-    IDictionary<string, string> GetEnvironmentInfo();
+    Task<IDictionary<string, string>> GetEnvironmentInfoAsync();
 }

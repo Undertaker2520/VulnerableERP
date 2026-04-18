@@ -1,5 +1,4 @@
 ﻿using BusinessLayer.Interfaces;
-using BusinessLayer.Services;
 using Common.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -17,7 +16,8 @@ public class ExternalController : ControllerBase
     [HttpPost("proxy")]
     public async Task<IActionResult> Proxy([FromBody] SsrfRequest request)
     {
-        var result = await _externalService.ProxyRequest(request.Url);
+        // Chiamata al metodo rinominato
+        var result = await _externalService.ProxyRequestAsync(request.Url);
         return Ok(new { Content = result });
     }
 }

@@ -2,5 +2,5 @@
 
 public interface IImportService
 {
-    string ImportSettings(string jsonConfig);
+    Task<string> ImportSettingsAsync(string jsonConfig);
 }

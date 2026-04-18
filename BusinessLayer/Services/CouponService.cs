@@ -1,36 +1,39 @@
 ﻿using BusinessLayer.Interfaces;
 using Common.DTOs;
 using DataAccessLayer;
+using Microsoft.EntityFrameworkCore; 
 
-namespace BusinessLayer.Services
+namespace BusinessLayer.Services;
+
+public class CouponService : ICouponService
 {
-    public class CouponService : ICouponService
+    private readonly AppDbContext _context;
+
+    public CouponService(AppDbContext context) => _context = context;
+
+    public async Task<string> ApplyCouponAsync(ApplyCouponRequest request)
     {
-        private readonly AppDbContext _context;
+        // Recupero asincrono dei dati
+        var coupon = await _context.Coupons.FirstOrDefaultAsync(c => c.Code == request.Code);
+        var invoice = await _context.Invoices.FindAsync(request.InvoiceId);
 
-        public CouponService(AppDbContext context) => _context = context;
+        if (coupon == null || invoice == null)
+            return "Coupon o Fattura non validi.";
 
-        public string ApplyCoupon(ApplyCouponRequest request)
-        {
-            var coupon = _context.Coupons.FirstOrDefault(c => c.Code == request.Code);
-            var invoice = _context.Invoices.Find(request.InvoiceId);
+        // VULNERABILITÀ: RACE CONDITION
+        // Senza un sistema di lock (es. lock pessimistico sul DB), 
+        // più task leggeranno IsUsed = false contemporaneamente.
+        if (coupon.IsUsed)
+            return "Coupon già utilizzato.";
 
-            if (coupon == null || invoice == null)
-                return "Coupon o Fattura non validi.";
+        // Task.Delay è perfetto qui: libera il thread permettendo a 
+        // decine di altre richieste di entrare in questa sezione di codice.
+        await Task.Delay(500);
 
-            //RACE CONDITION
-            //Se 2 richieste arrivano contemporaneamente, entrambe leggeranno IsUsed = false
-            if (coupon.IsUsed)
-                return "Coupon già utilizzato.";
+        invoice.Amount -= coupon.DiscountAmount;
+        coupon.IsUsed = true;
 
-            //allarghiamo artificialmente la finestra di ritardo per facilitare l'attacco
-            Thread.Sleep(500);
-
-            invoice.Amount -= coupon.DiscountAmount;
-            coupon.IsUsed = true; //solo ora viene segnato come usato
-
-            _context.SaveChanges();
-            return $"Sconto di {coupon.DiscountAmount} applicato con successo!";
-        }
+        await _context.SaveChangesAsync();
+        return $"Sconto di {coupon.DiscountAmount} applicato con successo!";
     }
 }

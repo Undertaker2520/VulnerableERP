@@ -13,15 +13,17 @@ public class UsersController : ControllerBase
     public UsersController(IUserService userService) => _userService = userService;
 
     [HttpGet]
-    public IActionResult GetAll()
+    public async Task<IActionResult> GetAll()
     {
+        // Controllo del privilegio amministrativo tramite Claim
         var isAdminClaim = User.Claims.FirstOrDefault(c => c.Type == "isAdmin")?.Value;
+
         if (isAdminClaim != null && bool.TryParse(isAdminClaim, out bool isAdmin) && isAdmin)
         {
-            return Ok(_userService.GetAllUsers());
+            var users = await _userService.GetAllUsersAsync();
+            return Ok(users);
         }
 
         return StatusCode(403, "Accesso negato: richiesti privilegi di amministratore.");
-
     }
 }

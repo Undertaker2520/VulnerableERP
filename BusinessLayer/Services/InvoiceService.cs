@@ -12,9 +12,11 @@ public class InvoiceService : IInvoiceService
 
     public InvoiceService(AppDbContext context) => _context = context;
 
-    public InvoiceResponse? GetInvoiceById(int id)
+    public async Task<InvoiceResponse?> GetInvoiceByIdAsync(int id)
     {
-        var invoice = _context.Invoices.Find(id);
+        // VULNERABILITÀ IDOR: Nessun controllo di proprietà sull'utente.
+        // FindAsync è perfetto per recuperare l'entità in modo non bloccante.
+        var invoice = await _context.Invoices.FindAsync(id);
 
         if (invoice == null) return null;
 
@@ -28,7 +30,7 @@ public class InvoiceService : IInvoiceService
         };
     }
 
-    public InvoiceResponse CreateInvoice(CreateInvoiceRequest request)
+    public async Task<InvoiceResponse> CreateInvoiceAsync(CreateInvoiceRequest request)
     {
         var invoice = new Invoice
         {
@@ -39,8 +41,8 @@ public class InvoiceService : IInvoiceService
             Date = DateTime.UtcNow
         };
 
-        _context.Invoices.Add(invoice);
-        _context.SaveChanges();
+        await _context.Invoices.AddAsync(invoice);
+        await _context.SaveChangesAsync();
 
         return new InvoiceResponse
         {

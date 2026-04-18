@@ -1,5 +1,6 @@
 ﻿using BusinessLayer.Interfaces;
 using Common.DTOs;
+using Common.DTOs.Invoice;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -7,7 +8,7 @@ namespace ERP.Api.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-[Authorize] // L'utente deve essere loggato, ma l'IDOR permette di vedere fatture altrui
+[Authorize]
 public class InvoicesController : ControllerBase
 {
     private readonly IInvoiceService _invoiceService;
@@ -15,9 +16,9 @@ public class InvoicesController : ControllerBase
     public InvoicesController(IInvoiceService invoiceService) => _invoiceService = invoiceService;
 
     [HttpGet("{id}")]
-    public IActionResult GetById(int id)
+    public async Task<IActionResult> GetById(int id)
     {
-        var invoice = _invoiceService.GetInvoiceById(id);
+        var invoice = await _invoiceService.GetInvoiceByIdAsync(id);
 
         if (invoice == null) return NotFound("Fattura non trovata.");
 
@@ -25,16 +26,16 @@ public class InvoicesController : ControllerBase
     }
 
     [HttpPost]
-    public IActionResult Create([FromBody] CreateInvoiceRequest request)
+    public async Task<IActionResult> Create([FromBody] CreateInvoiceRequest request)
     {
-        // Controllo Admin
-        var isAdmin = User.Claims.FirstOrDefault(c => c.Type == "isAdmin")?.Value;
-        if (isAdmin == null || !bool.Parse(isAdmin))
+        // Controllo Admin manuale (Vulnerabile a potenziali bypass logici)
+        var isAdminClaim = User.Claims.FirstOrDefault(c => c.Type == "isAdmin")?.Value;
+        if (isAdminClaim == null || !bool.Parse(isAdminClaim))
         {
             return StatusCode(403, "Solo gli amministratori possono generare fatture.");
         }
 
-        var result = _invoiceService.CreateInvoice(request);
+        var result = await _invoiceService.CreateInvoiceAsync(request);
         return Ok(result);
     }
 }

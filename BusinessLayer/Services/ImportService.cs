@@ -1,21 +1,14 @@
 ﻿using BusinessLayer.Interfaces;
-using Common.DTOs;
-using Common.DTOs.Invoice;
-using Common.Models;
-using DataAccessLayer;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 
 namespace BusinessLayer.Services;
 
 public class ImportService : IImportService
 {
-    public string ImportSettings(string jsonConfig)
+    public async Task<string> ImportSettingsAsync(string jsonConfig)
     {
-        //VULNERABILITA': Insecure Deserialization
-        // TypeNameHandling.All permette al JSON di definire quale tipo di oggetto creare.
-        // Un attaccante può usare questo per forzare il caricamento di classi pericolose.
+        // VULNERABILITÀ: Insecure Deserialization (OWASP A08)
+        // TypeNameHandling.All è il "sacro graal" degli attaccanti .NET.
         var settings = new JsonSerializerSettings
         {
             TypeNameHandling = TypeNameHandling.All
@@ -23,12 +16,17 @@ public class ImportService : IImportService
 
         try
         {
-            //il server prova a deserializzare "qualsiasi cosa" l'utente abbia inviato
-            object? deserializedData = JsonConvert.DeserializeObject(jsonConfig, settings);
+            // Eseguiamo la deserializzazione. In un caso reale, qui potrebbe 
+            // esserci un'attesa di I/O (es. lettura da un blob storage), 
+            // per ora simuliamo il pattern async.
+            object? deserializedData = await Task.Run(() => JsonConvert.DeserializeObject(jsonConfig, settings));
+
             return $"Configurazione caricata con successo: {deserializedData?.GetType().Name}";
         }
         catch (Exception ex)
         {
+            // Nota: Restituire il messaggio dell'eccezione è un'altra piccola 
+            // Information Disclosure che aiuta l'attaccante a fare il debug del payload.
             return $"Errore di importazione: {ex.Message}";
         }
     }

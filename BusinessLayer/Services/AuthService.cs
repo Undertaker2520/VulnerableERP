@@ -4,6 +4,7 @@ using Common.DTOs;
 using Common.DTOs.User;
 using Common.Models;
 using DataAccessLayer;
+using Microsoft.EntityFrameworkCore;
 
 namespace BusinessLayer.Services
 {
@@ -13,10 +14,10 @@ namespace BusinessLayer.Services
 
         public AuthService(AppDbContext context) => _context = context;
 
-        public (bool Success, string Message, User? User) RegisterUser(RegisterRequest request)
+        public async Task<(bool Success, string Message, User? User)> RegisterUserAsync(RegisterRequest request)
         {
-            //check if user already exists
-            if (_context.Users.Any(u => u.Username == request.Username))
+            // Verifichiamo se l'utente esiste senza bloccare il thread
+            if (await _context.Users.AnyAsync(u => u.Username == request.Username))
             {
                 return (false, "Username already exists", null);
             }
@@ -34,14 +35,14 @@ namespace BusinessLayer.Services
             };
 
             _context.Users.Add(newUser);
-            _context.SaveChanges();
+            _context.SaveChangesAsync();
 
             return (true, "User registered successfully", newUser);
         }
 
-        public (bool Success, string Message, string? Token) Login(LoginRequest request)
+        public async Task<(bool Success, string Message, string? Token)> LoginAsync(LoginRequest request)
         {
-            var user = _context.Users.FirstOrDefault(u =>
+            var user = await _context.Users.FirstOrDefaultAsync(u =>
             u.Username == request.Username &&
             u.PasswordHash == request.Password);
 

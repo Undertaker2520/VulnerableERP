@@ -11,13 +11,13 @@ public class AuthController : ControllerBase
 {
     private readonly IAuthService _authService;
 
-    // Iniettiamo l'interfaccia del servizio, non più il DbContext!
     public AuthController(IAuthService authService) => _authService = authService;
 
     [HttpPost("register")]
-    public IActionResult Register([FromBody] RegisterRequest request)
+    public async Task<IActionResult> Register([FromBody] RegisterRequest request)
     {
-        var result = _authService.RegisterUser(request);
+        // Attendiamo il risultato del servizio
+        var result = await _authService.RegisterUserAsync(request);
 
         if (!result.Success)
         {
@@ -32,11 +32,10 @@ public class AuthController : ControllerBase
         });
     }
 
-
     [HttpPost("login")]
-    public IActionResult Login([FromBody] LoginRequest request)
+    public async Task<IActionResult> Login([FromBody] LoginRequest request)
     {
-        var result = _authService.Login(request);
+        var result = await _authService.LoginAsync(request);
 
         if (!result.Success)
         {
