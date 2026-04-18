@@ -35,11 +35,13 @@ builder.Services.AddSwaggerGen(c =>
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+builder.Services.AddHttpClient();
+
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ITicketService, TicketService>();
 builder.Services.AddScoped<IInvoiceService, InvoiceService>();
-builder.Services.AddScoped<IUserService, UserService>();
-
+builder.Services.AddScoped<IUserService, UserService>(); 
+builder.Services.AddScoped<IExternalService, ExternalService>();
 // 3. Autenticazione JWT Vulnerabile
 builder.Services.AddAuthentication(options =>
 {
@@ -74,4 +76,3 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
-// (Ho rimosso la classe custom in fondo, non ci serve più!)
