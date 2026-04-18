@@ -12,10 +12,7 @@ public class AuthController : ControllerBase
     private readonly IAuthService _authService;
 
     // Iniettiamo l'interfaccia del servizio, non più il DbContext!
-    public AuthController(IAuthService authService)
-    {
-        _authService = authService;
-    }
+    public AuthController(IAuthService authService) => _authService = authService;
 
     [HttpPost("register")]
     public IActionResult Register([FromBody] RegisterRequest request)

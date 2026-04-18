@@ -11,10 +11,7 @@ namespace BusinessLayer.Services
     {
         private readonly AppDbContext _context;
 
-        public TicketService(AppDbContext context)
-        {
-            _context = context;
-        }
+        public TicketService(AppDbContext context) => _context = context;
 
         public TicketResponse CreateTicket(CreateTicketRequest request, int userId)
         {

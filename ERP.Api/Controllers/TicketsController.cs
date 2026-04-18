@@ -13,10 +13,7 @@ public class TicketsController : ControllerBase
 {
     private readonly ITicketService _ticketService;
     
-    public TicketsController(ITicketService ticketService)
-    {
-        _ticketService = ticketService;
-    }
+    public TicketsController(ITicketService ticketService) => _ticketService = ticketService;
 
     [HttpPost]
     public IActionResult Create([FromBody] CreateTicketRequest request)

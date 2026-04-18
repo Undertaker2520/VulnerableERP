@@ -11,10 +11,7 @@ namespace BusinessLayer.Services
     {
         private readonly AppDbContext _context;
 
-        public AuthService(AppDbContext context)
-        {
-            _context = context;
-        }
+        public AuthService(AppDbContext context) => _context = context;
 
         public (bool Success, string Message, User? User) RegisterUser(RegisterRequest request)
         {

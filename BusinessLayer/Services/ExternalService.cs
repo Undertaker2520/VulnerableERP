@@ -11,10 +11,7 @@ public class ExternalService : IExternalService
 {
     private readonly IHttpClientFactory _httpClientFactory;
 
-    public ExternalService(IHttpClientFactory httpClientFactory)
-    {
-        _httpClientFactory = httpClientFactory;
-    }
+    public ExternalService(IHttpClientFactory httpClientFactory) => _httpClientFactory = httpClientFactory;
 
     public async Task<string> ProxyRequest(string url)
     {

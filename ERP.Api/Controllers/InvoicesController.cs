@@ -12,10 +12,7 @@ public class InvoicesController : ControllerBase
 {
     private readonly IInvoiceService _invoiceService;
 
-    public InvoicesController(IInvoiceService invoiceService)
-    {
-        _invoiceService = invoiceService;
-    }
+    public InvoicesController(IInvoiceService invoiceService) => _invoiceService = invoiceService;
 
     [HttpGet("{id}")]
     public IActionResult GetById(int id)

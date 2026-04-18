@@ -10,10 +10,7 @@ public class InvoiceService : IInvoiceService
 {
     private readonly AppDbContext _context;
 
-    public InvoiceService(AppDbContext context)
-    {
-        _context = context;
-    }
+    public InvoiceService(AppDbContext context) => _context = context;
 
     public InvoiceResponse? GetInvoiceById(int id)
     {
