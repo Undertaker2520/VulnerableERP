@@ -1,8 +1,5 @@
-﻿using Authentication;
-using BusinessLayer.Interfaces;
+﻿using BusinessLayer.Interfaces;
 using Common.DTOs;
-using Common.DTOs.User;
-using Common.Models;
 using DataAccessLayer;
 
 namespace BusinessLayer.Services
