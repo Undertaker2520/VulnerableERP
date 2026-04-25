@@ -1,0 +1,31 @@
+.status-badge {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  
+  &.approved {
+    background-color: #e8f5e9;
+    color: #2e7d32;
+  }
+  
+  &.pending {
+    background-color: #fff3e0;
+    color: #ef6c00;
+  }
+  
+  &.rejected {
+    background-color: #ffebee;
+    color: #c62828;
+  }
+}
+
+.action-btn {
+  background-color: var(--warning-color);
+  font-size: 0.85rem;
+  padding: 6px 12px;
+  
+  &:hover {
+    background-color: #e65100;
+  }
+}

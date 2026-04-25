@@ -1,0 +1,69 @@
+/* You can add global styles to this file, and also import other style files */
+html, body { height: 100%; margin: 0; padding: 0; font-family: 'Inter', sans-serif; background-color: #f5f7fa; }
+
+/* Placeholder for custom ERP variables */
+:root {
+  --primary-color: #1e88e5;
+  --secondary-color: #424242;
+  --danger-color: #e53935;
+  --success-color: #43a047;
+  --warning-color: #fb8c00;
+  --background-color: #f5f7fa;
+  --surface-color: #ffffff;
+  --border-color: #e0e0e0;
+}
+
+/* Base custom styles to simulate Material if not installed */
+.erp-card {
+  background: var(--surface-color);
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.erp-header {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--secondary-color);
+  margin-bottom: 15px;
+}
+
+.erp-button {
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.erp-button:hover {
+  background-color: #1565c0;
+}
+
+.erp-button.danger {
+  background-color: var(--danger-color);
+}
+.erp-button.danger:hover {
+  background-color: #c62828;
+}
+
+.erp-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.erp-table th, .erp-table td {
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.erp-table th {
+  background-color: #f9fafb;
+  font-weight: 600;
+  color: #6b7280;
+}
