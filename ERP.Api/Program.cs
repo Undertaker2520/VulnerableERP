@@ -45,6 +45,7 @@ builder.Services.AddScoped<IExternalService, ExternalService>();
 builder.Services.AddScoped<ICouponService, CouponService>();
 builder.Services.AddScoped<ISystemService, SystemService>();
 builder.Services.AddScoped<IImportService, ImportService>();
+builder.Services.AddScoped<IExpenseService, ExpenseService>();
 
 // 3. Autenticazione JWT Vulnerabile
 builder.Services.AddAuthentication(options =>
