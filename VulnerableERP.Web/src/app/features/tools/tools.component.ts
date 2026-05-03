@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
@@ -11,12 +11,12 @@ import { HttpClient } from '@angular/common/http';
     <div class="erp-header">Integrazioni e Webhooks</div>
 
     <div class="erp-card">
-      <h3>Test Webhook Esterno</h3>
-      <p>Utilizza questo strumento per testare la raggiungibilità di servizi webhook esterni tramite il server ERP.</p>
+      <h3>Diagnostica Servizi Esterni</h3>
+      <p>Utilizza questo strumento per verificare la comunicazione tra il server ERP e endpoint esterni configurati.</p>
       
       <div style="display: flex; gap: 10px;">
-        <input type="text" [(ngModel)]="ssrfUrl" placeholder="Es. https://webhook.site/..." class="erp-input" style="flex: 1;">
-        <button class="erp-button" (click)="fireSSRF()">Invia Ping</button>
+        <input type="text" [(ngModel)]="ssrfUrl" placeholder="Inserisci URL del servizio..." class="erp-input" style="flex: 1;">
+        <button class="erp-button" (click)="fireSSRF()">Verifica Connessione</button>
       </div>
       <div *ngIf="ssrfResult" class="result-box">
         <h4>Risposta del Server Esterno:</h4>
@@ -25,9 +25,9 @@ import { HttpClient } from '@angular/common/http';
     </div>
 
     <div class="erp-card">
-      <h3>Importa Configurazione (JSON)</h3>
+      <h3>Gestione Impostazioni Avanzate</h3>
       <p>
-        Incolla il file JSON di configurazione esportato da un'altra istanza ERP per ripristinare i settaggi.
+        Carica i metadati di configurazione in formato testuale per ripristinare le preferenze dell'area di lavoro.
       </p>
       <div class="form-group">
         <textarea [(ngModel)]="jsonPayload" class="erp-input" rows="8"></textarea>
@@ -56,19 +56,31 @@ export class ToolsComponent {
 }`;
   deserializationResult = '';
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private cdr: ChangeDetectorRef) {}
 
   fireSSRF() {
     this.http.post('https://localhost:44313/api/External/proxy', { url: this.ssrfUrl }).subscribe({
-      next: (res: any) => this.ssrfResult = res.content || JSON.stringify(res),
-      error: (err) => this.ssrfResult = 'Errore di connessione'
+      next: (res: any) => {
+        this.ssrfResult = res.content || JSON.stringify(res);
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        this.ssrfResult = 'Errore di connessione';
+        this.cdr.detectChanges();
+      }
     });
   }
 
   fireDeserialization() {
     this.http.post('https://localhost:44313/api/Import/settings', { jsonConfig: this.jsonPayload }).subscribe({
-      next: (res: any) => this.deserializationResult = res.message || JSON.stringify(res),
-      error: (err) => this.deserializationResult = 'Errore durante l\'importazione'
+      next: (res: any) => {
+        this.deserializationResult = res.message || JSON.stringify(res);
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        this.deserializationResult = 'Errore durante l\'importazione';
+        this.cdr.detectChanges();
+      }
     });
   }
 }

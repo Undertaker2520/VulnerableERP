@@ -15,7 +15,7 @@ public class UsersController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
-        // Controllo del privilegio amministrativo tramite Claim
+        // Controllo del privilegio amministrativo tramite Claim senza double check da DB
         var isAdminClaim = User.Claims.FirstOrDefault(c => c.Type == "isAdmin")?.Value;
 
         if (isAdminClaim != null && bool.TryParse(isAdminClaim, out bool isAdmin) && isAdmin)

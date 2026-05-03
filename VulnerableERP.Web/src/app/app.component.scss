@@ -38,11 +38,16 @@
     display: flex;
     align-items: center;
     gap: 15px;
-    transition: background-color 0.2s;
+    transition: all 0.2s ease;
     
     &:hover, &.active {
       background-color: #334155;
       color: white;
+      padding-left: 25px;
+    }
+
+    .material-icons {
+      pointer-events: none;
     }
   }
 }

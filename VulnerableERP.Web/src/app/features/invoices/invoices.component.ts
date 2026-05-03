@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
@@ -57,12 +57,15 @@ export class InvoicesComponent {
   couponPayload = { invoiceId: 1, code: 'SCONTO50' };
   couponResult: string = '';
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private cdr: ChangeDetectorRef) {}
 
   searchInvoice() {
     if (!this.searchId) return;
     this.http.get(`https://localhost:44313/api/Invoices/${this.searchId}`).subscribe({
-      next: (data) => this.foundInvoice = data,
+      next: (data) => {
+        this.foundInvoice = data;
+        this.cdr.detectChanges();
+      },
       error: (err) => alert('Fattura non trovata o errore di sistema')
     });
   }
@@ -75,8 +78,12 @@ export class InvoicesComponent {
           try {
              this.couponResult = JSON.parse(res).message;
           } catch(e) { this.couponResult = res; }
+          this.cdr.detectChanges();
         },
-        error: (err) => this.couponResult = 'Errore durante l\'applicazione dello sconto'
+        error: (err) => {
+          this.couponResult = 'Errore durante l\'applicazione dello sconto';
+          this.cdr.detectChanges();
+        }
       });
   }
 }

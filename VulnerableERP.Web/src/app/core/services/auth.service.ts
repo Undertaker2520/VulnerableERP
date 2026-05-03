@@ -52,4 +52,20 @@ export class AuthService {
       return false;
     }
   }
+
+  get username(): string {
+    const token = this.getToken();
+    if (!token) return 'Utente ERP';
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      // .NET ClaimTypes.Name often maps to this long URL or 'unique_name'
+      return payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name'] || 
+             payload.unique_name || 
+             payload.name || 
+             payload.sub || 
+             'Utente ERP';
+    } catch {
+      return 'Utente ERP';
+    }
+  }
 }

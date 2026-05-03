@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
@@ -63,12 +63,12 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
     .erp-input { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 4px; box-sizing: border-box; margin-top: 5px; }
   `]
 })
-export class TicketsComponent {
+export class TicketsComponent implements OnInit {
   tickets: any[] = [];
   searchQuery = '';
   newTicket = { title: '', description: '' };
 
-  constructor(private http: HttpClient, private sanitizer: DomSanitizer) {}
+  constructor(private http: HttpClient, private sanitizer: DomSanitizer, private cdr: ChangeDetectorRef) {}
 
   ngOnInit() {
     this.loadTickets();
@@ -81,7 +81,10 @@ export class TicketsComponent {
   }
 
   loadTickets() {
-    this.http.get<any[]>('https://localhost:44313/api/Tickets').subscribe(data => this.tickets = data);
+    this.http.get<any[]>('https://localhost:44313/api/Tickets').subscribe(data => {
+      this.tickets = data;
+      this.cdr.detectChanges();
+    });
   }
 
   searchTickets() {

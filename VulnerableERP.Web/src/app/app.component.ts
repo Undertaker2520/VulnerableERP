@@ -16,22 +16,22 @@ import { AuthService } from './core/services/auth.service';
           <h2>VulnerableERP</h2>
         </div>
         <nav class="nav-menu">
-          <a routerLink="/dashboard" routerLinkActive="active" class="nav-item">
+          <a [routerLink]="['/dashboard']" routerLinkActive="active" class="nav-item">
             <span class="material-icons">dashboard</span> Dashboard
           </a>
-          <a routerLink="/invoices" routerLinkActive="active" class="nav-item">
+          <a [routerLink]="['/invoices']" routerLinkActive="active" class="nav-item">
             <span class="material-icons">receipt</span> Fatture
           </a>
-          <a routerLink="/tickets" routerLinkActive="active" class="nav-item">
+          <a [routerLink]="['/tickets']" routerLinkActive="active" class="nav-item">
             <span class="material-icons">support_agent</span> Ticket
           </a>
-          <a routerLink="/expense-reports" routerLinkActive="active" class="nav-item">
+          <a [routerLink]="['/expense-reports']" routerLinkActive="active" class="nav-item">
             <span class="material-icons">request_quote</span> Note Spese
           </a>
-          <a routerLink="/tools" routerLinkActive="active" class="nav-item">
-            <span class="material-icons">build</span> Tools (SSRF / Json)
+          <a [routerLink]="['/tools']" *ngIf="authService.isAdmin" routerLinkActive="active" class="nav-item">
+            <span class="material-icons">build</span> Tools
           </a>
-          <a routerLink="/config" routerLinkActive="active" class="nav-item">
+          <a [routerLink]="['/config']" *ngIf="authService.isAdmin" routerLinkActive="active" class="nav-item">
             <span class="material-icons">settings</span> Configurazione
           </a>
         </nav>
@@ -40,7 +40,7 @@ import { AuthService } from './core/services/auth.service';
         <header class="top-header" *ngIf="showSidebar">
           <div class="user-info">
             <span class="material-icons">account_circle</span>
-            <span>Utente ERP</span>
+            <span>{{authService.username}}</span>
             <button class="erp-button danger" style="padding: 4px 8px; margin-left: 15px;" (click)="logout()">Logout</button>
           </div>
         </header>
@@ -56,7 +56,7 @@ export class AppComponent {
   title = 'VulnerableERP';
   showSidebar = true;
 
-  constructor(private router: Router, private authService: AuthService) {
+  constructor(private router: Router, public authService: AuthService) {
     this.router.events.pipe(
       filter(event => event instanceof NavigationEnd)
     ).subscribe((event: any) => {

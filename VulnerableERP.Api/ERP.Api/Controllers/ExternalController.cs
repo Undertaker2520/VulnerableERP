@@ -16,7 +16,6 @@ public class ExternalController : ControllerBase
     [HttpPost("proxy")]
     public async Task<IActionResult> Proxy([FromBody] SsrfRequest request)
     {
-        // Chiamata al metodo rinominato
         var result = await _externalService.ProxyRequestAsync(request.Url);
         return Ok(new { Content = result });
     }
