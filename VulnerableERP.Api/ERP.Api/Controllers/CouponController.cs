@@ -1,4 +1,4 @@
-﻿using BusinessLayer.Interfaces;
+using BusinessLayer.Interfaces;
 using Common.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -14,10 +14,17 @@ public class CouponController : ControllerBase
 
     public CouponController(ICouponService couponService) => _couponService = couponService;
 
+    [HttpPost("validate")]
+    public async Task<IActionResult> Validate([FromBody] ApplyCouponRequest request)
+    {
+        var result = await _couponService.ValidateCouponAsync(request);
+        if (result != "OK") return BadRequest(new { Message = result });
+        return Ok(new { Message = "OK" });
+    }
+
     [HttpPost("apply")]
     public async Task<IActionResult> Apply([FromBody] ApplyCouponRequest request)
     {
-        // Chiamata asincrona al servizio
         var result = await _couponService.ApplyCouponAsync(request);
         return Ok(new { Message = result });
     }

@@ -105,6 +105,8 @@ export class ExpenseReportsComponent implements OnInit {
   }
 
   forceApprove(id: number) {
+    if (!confirm("Confermi l'approvazione manuale di questa nota spesa? Lo stato verrà forzato ad 'Approved'.")) return;
+
     this.http.patch('https://localhost:44313/api/Expenses/status', {
       expenseId: id,
       newStatus: 'Approved'

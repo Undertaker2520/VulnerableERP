@@ -71,19 +71,38 @@ export class InvoicesComponent {
   }
 
   applyCoupon() {
-    this.couponResult = 'Elaborazione in corso...';
-    this.http.post('https://localhost:44313/api/Coupon/apply', this.couponPayload, { responseType: 'text' as 'json' })
-      .subscribe({
-        next: (res: any) => {
-          try {
-             this.couponResult = JSON.parse(res).message;
-          } catch(e) { this.couponResult = res; }
-          this.cdr.detectChanges();
-        },
-        error: (err) => {
-          this.couponResult = 'Errore durante l\'applicazione dello sconto';
+    this.couponResult = 'Validazione in corso...';
+    
+    // Step 1: Validazione PRIMA del popup
+    this.http.post('https://localhost:44313/api/Coupon/validate', this.couponPayload).subscribe({
+      next: (res: any) => {
+        // Step 2: Popup di conferma dopo la validazione positiva
+        if (confirm("Coupon valido! Vuoi procedere con l'applicazione dello sconto?")) {
+          this.couponResult = 'Applicazione in corso...';
+          
+          // Step 3: Applicazione effettiva (Senza ulteriore controllo nel backend)
+          this.http.post('https://localhost:44313/api/Coupon/apply', this.couponPayload, { responseType: 'text' as 'json' })
+            .subscribe({
+              next: (applyRes: any) => {
+                try {
+                   this.couponResult = JSON.parse(applyRes).message;
+                } catch(e) { this.couponResult = applyRes; }
+                this.cdr.detectChanges();
+              },
+              error: (err) => {
+                this.couponResult = 'Errore durante l\'applicazione dello sconto';
+                this.cdr.detectChanges();
+              }
+            });
+        } else {
+          this.couponResult = 'Operazione annullata dall\'utente.';
           this.cdr.detectChanges();
         }
-      });
+      },
+      error: (err) => {
+        this.couponResult = err.error?.message || 'Errore durante la validazione del coupon.';
+        this.cdr.detectChanges();
+      }
+    });
   }
 }

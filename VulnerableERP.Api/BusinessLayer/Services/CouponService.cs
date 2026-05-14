@@ -1,4 +1,4 @@
-﻿using BusinessLayer.Interfaces;
+using BusinessLayer.Interfaces;
 using Common.DTOs;
 using DataAccessLayer;
 using Microsoft.EntityFrameworkCore; 
@@ -11,25 +11,25 @@ public class CouponService : ICouponService
 
     public CouponService(AppDbContext context) => _context = context;
 
+    public async Task<string> ValidateCouponAsync(ApplyCouponRequest request)
+    {
+        var coupon = await _context.Coupons.FirstOrDefaultAsync(c => c.Code == request.Code);
+        if (coupon == null) return "Coupon non valido.";
+        if (coupon.IsUsed) return "Coupon già utilizzato.";
+        return "OK";
+    }
+
     public async Task<string> ApplyCouponAsync(ApplyCouponRequest request)
     {
-        // Recupero asincrono dei dati
         var coupon = await _context.Coupons.FirstOrDefaultAsync(c => c.Code == request.Code);
         var invoice = await _context.Invoices.FindAsync(request.InvoiceId);
 
         if (coupon == null || invoice == null)
             return "Coupon o Fattura non validi.";
 
-        // VULNERABILITÀ: RACE CONDITION
-        // Senza un sistema di lock (es. lock pessimistico sul DB), 
-        // più task leggeranno IsUsed = false contemporaneamente.
-        if (coupon.IsUsed)
-            return "Coupon già utilizzato.";
-
-        // Task.Delay è perfetto qui: libera il thread permettendo a 
-        // decine di altre richieste di entrare in questa sezione di codice.
-        await Task.Delay(500);
-
+        // VULNERABILITÀ TOCTOU (Time-of-Check to Time-of-Use)
+        // La validazione è avvenuta prima del popup. Qui non ricontrolliamo apposta lo stato IsUsed.
+        
         invoice.Amount -= coupon.DiscountAmount;
         coupon.IsUsed = true;
 
